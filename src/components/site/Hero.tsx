@@ -1,4 +1,4 @@
-mport { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import heroImg from "@/assets/hero-machine.jpg";
 
