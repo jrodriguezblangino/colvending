@@ -1,5 +1,5 @@
-import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { motion, useInView, animate } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 const stats = [
   { value: 500, prefix: "", suffix: "", label: "Unidades por máquina", note: "400–500" },
@@ -10,18 +10,26 @@ const stats = [
 
 function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => Math.round(v).toString() + suffix);
+  const inView = useInView(ref, { once: true, amount: 0.35 });
+  const [display, setDisplay] = useState(`0${suffix}`);
 
   useEffect(() => {
-    if (inView) {
-      const controls = animate(count, to, { duration: 1.8, ease: "easeOut" });
-      return controls.stop;
-    }
-  }, [inView, count, to]);
+    if (!inView) return;
 
-  return <motion.span ref={ref}>{rounded}</motion.span>;
+    const controls = animate(0, to, {
+      duration: 1.8,
+      ease: "easeOut",
+      onUpdate: (latest) => setDisplay(`${Math.round(latest)}${suffix}`),
+    });
+
+    return () => controls.stop();
+  }, [inView, to, suffix]);
+
+  return (
+    <span ref={ref} className="inline-block min-w-[3ch] tabular-nums">
+      {display}
+    </span>
+  );
 }
 
 export function Stats() {
